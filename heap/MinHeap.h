@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <unordered_map>
 #include <vector>
@@ -9,16 +10,15 @@ private:
     //can't contain the inputted books itself
     unordered_map<int, int> ratingScore;
 
-public:
-    MinHeap() {}
-    MinHeap(unordered_map<int, int> _ratingScore);
-
-    //is bookID going to be string?
     void insert(int bookID);
     int pop();
     int min();
     void print();
     int* returnBooks();
+
+public:
+    MinHeap() {}
+    MinHeap(unordered_map<int, int> _ratingScore);
 
     //ratingScore contains the similarity score relative to user's favorite book
     //map of bookID (int), similarity score (int)

@@ -1,4 +1,4 @@
-#include "minHeap.h"
+#include "MinHeap.h"
 
 MinHeap::MinHeap(unordered_map<int, int> _ratingScore)
 {

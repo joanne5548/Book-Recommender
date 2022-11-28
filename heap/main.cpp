@@ -1,5 +1,5 @@
 #include <iostream>
-#include "minHeap.h"
+#include "MinHeap.h"
 
 int main()
 {
