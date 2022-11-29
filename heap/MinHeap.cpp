@@ -1,5 +1,42 @@
 #include "MinHeap.h"
 
+//Constructs MinHeap with userInput containing bookID of books user inputed
+//and reviews containing Key: userID, Value: vectors of bookID this user liked
+MinHeap::MinHeap(vector<int> userInput, unordered_map<int, vector<int>> reviews)
+{
+    for (auto it = reviews.begin(); it != reviews.end(); ++it)
+    {
+        vector<int> likedBooks = it->second;
+        int factor = 0;
+
+        //check how many inputted books this user liked
+        for (int i = 0; i < userInput.size(); ++i)
+        {
+            if (find(likedBooks.begin(), likedBooks.end(), userInput[i])
+                                                    != likedBooks.end())
+                ++factor;
+        }
+
+        //Update rating score for each reviewed books
+        for (int i = 0; i < likedBooks.size(); ++i)
+        {
+            int bookID = likedBooks[i];
+            //if this is not the inputted book itself, insert to rating score list
+            if (find(userInput.begin(), userInput.end(), bookID) == userInput.end())
+            {
+                if (ratingScore.find(bookID) == ratingScore.end())
+                    ratingScore[bookID] = factor;
+                else
+                    ratingScore[bookID] += factor;
+            }
+        }
+    }
+
+    //Print ratingScore for debugging
+    // for (auto it = ratingScore.begin(); it != ratingScore.end(); ++it)
+    //     cout << "BookID: " << it->first << ", Similarity: " << it->second << endl;
+}
+
 MinHeap::MinHeap(unordered_map<int, int> _ratingScore)
 {
     ratingScore = _ratingScore;
@@ -135,10 +172,18 @@ int* MinHeap::returnBooks()
     int* books = new int[size];
     for (int i = size - 1; i >= 0; --i)
         books[i] = pop();
+
+    for (int i = 0; i < size; ++i)
+    {
+        cout << "Book #" << i + 1 << ": " << books[i] << ", ";
+        cout << ratingScore[books[i]] << " people also liked this book" << endl;
+    }
+
     return books;
 }
 
 //update heap with bookNum of recommended books
+//returns array with recommended books, in decreasing order of similarity score
 int* MinHeap::recommendBooks(int bookNum)
 {
     unordered_map<int, int>::iterator it = ratingScore.begin();
