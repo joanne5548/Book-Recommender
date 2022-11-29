@@ -7,7 +7,7 @@
 #include "Book.h"
 #include "MinHeap.h"
 
-void readBooks(std::unordered_map<unsigned int, Book>& books, const std::string& file);
+void readBooks(std::unordered_map<int, Book>& books, const std::string& file);
 
 void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                  const std::string& file);
@@ -15,7 +15,9 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
 int main() {
 
     // Key: Book id; Value: Book object that stores info
-    std::unordered_map<unsigned int, Book> books;
+    std::unordered_map<int, Book> books;
+    //vv this somehow produces error
+    //readBooks(books, "../data/books.csv");
 
     // Key: User id; Value: Vector of Liked Books (Books rated 4 and up)
     std::unordered_map<int, std::vector<int>> reviews;
@@ -34,7 +36,7 @@ int main() {
     return 0;
 }
 
-void readBooks(std::unordered_map<unsigned int, Book>& books, const std::string& file) {
+void readBooks(std::unordered_map<int, Book>& books, const std::string& file) {
 
     std::ifstream in(file, std::ifstream::in);
 
