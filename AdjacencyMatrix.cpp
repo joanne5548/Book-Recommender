@@ -10,7 +10,10 @@ AdjacencyMatrix::AdjacencyMatrix() {
     }
 }
 
-void AdjacencyMatrix::InsertEdge(int firstISBN, int secondISBN) {
+void AdjacencyMatrix::InsertEdge(long firstISBN, long secondISBN) {
+    if(firstISBN == secondISBN)
+        return;
+
     if(indexMatcher.count(firstISBN) == 0) {
         indexMatcher.emplace(firstISBN, indexCounter);
         reverseIndexMatcher.emplace(indexCounter, firstISBN);
@@ -26,11 +29,11 @@ void AdjacencyMatrix::InsertEdge(int firstISBN, int secondISBN) {
     matrix[indexMatcher[secondISBN]][indexMatcher[firstISBN]]++;
 }
 
-int AdjacencyMatrix::GetWeight(int firstISBN, int secondISBN) {
+int AdjacencyMatrix::GetWeight(long firstISBN, long secondISBN) {
     return matrix[indexMatcher[firstISBN]][indexMatcher[secondISBN]];
 }
 
-void AdjacencyMatrix::GetAdjacentNodes(int isbn, unordered_map<int, int>& allNodes) {
+void AdjacencyMatrix::GetAdjacentNodes(long isbn, unordered_map<int, int>& allNodes) {
     for(int i = 0; i < 10000; i++) {
         if(matrix[indexMatcher[isbn]][i] != 0) {
             allNodes.emplace(reverseIndexMatcher[i], matrix[indexMatcher[isbn]][i]);
@@ -39,8 +42,8 @@ void AdjacencyMatrix::GetAdjacentNodes(int isbn, unordered_map<int, int>& allNod
 }
 
 void AdjacencyMatrix::PrintMatrix() {
-    for(int i = 0; i < 8; i++) {
-        for(int j = 0; j < 8; j++) {
+    for(int i = 0; i < 10000; i++) {
+        for(int j = 0; j < 10000; j++) {
             cout << matrix[i][j] << " ";
         }
         cout << endl;
