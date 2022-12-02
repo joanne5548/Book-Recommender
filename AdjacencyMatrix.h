@@ -10,8 +10,8 @@ class AdjacencyMatrix {
     int indexCounter;
 public:
     AdjacencyMatrix();
-    void InsertEdge(int firstISBN, int secondISBN);
-    int GetWeight(int firstISBN, int secondISBN);
-    void GetAdjacentNodes(int isbn, unordered_map<int, int>& allNodes);
+    void InsertEdge(long firstISBN, long secondISBN);
+    int GetWeight(long firstISBN, long secondISBN);
+    void GetAdjacentNodes(long isbn, unordered_map<int, int>& allNodes);
     void PrintMatrix();
 };
