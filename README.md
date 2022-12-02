@@ -1,24 +1,42 @@
 # FishAgainstEducation
 
+# Code for Terminal "GUI"
+int main()
+{
+    for (int j = 0; j < 2; ++j)
+    {
+        for (int i = 0; i < 70; ++i)
+            cout << "*";
+        cout << endl;
+    }
 
-For Sam's Adjacency Matrix:
+    cout << "Welcome to Book Recommender!" << endl;
+    cout << "First, enter ISBN of your favorite books." << endl;
+    cout << "If you are done, enter \"done\"." << endl;
 
+    //read in ISBN's
 
-AdjacencyMatrix():
+    //when done is entered
+    cout << endl << "Thank you!" << endl;
+    cout << "Now, tell us how many books you would like us to recommend." << endl;
 
-The constructor. It takes no parameters, just makes an empty 10000x10000 graph.
+    //read in number of books to be recommended
 
+    cout << endl << "Thanks! Picking books for you ..." << endl;
 
-void InsertEdge(int firstISBN, int secondISBN):
+    //Calculate the whole thing with matrix and heap
 
-Just takes two intergers and places them onto the map.
+    cout << "Recommended books are:" << endl;
 
+    //display the result
 
-int GetWeight(int firstISBN, int secondISBN):
-
-Returns the weight between two books.
-
-
-void GetAdjacentNodes(int isbn, unordered_map<int, int>& allNodes):
-
-Mutates a given unordered map to return all of the adjacent books (with the key being the ISBN) and the value as the weight of the edge.
+    cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
+    
+    for (int j = 0; j < 2; ++j)
+    {
+        for (int i = 0; i < 70; ++i)
+            cout << "*";
+        cout << endl;
+    }
+    return 0; 
+}
