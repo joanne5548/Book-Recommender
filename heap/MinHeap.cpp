@@ -166,13 +166,14 @@ void MinHeap::print()
 }
 
 //returns array of bookID's in order, but destroys the heap
-int* MinHeap::returnBooks()
+vector<int> MinHeap::returnBooks()
 {
     int size = heap.size();
-    int* books = new int[size];
+    vector<int> books(size);
     for (int i = size - 1; i >= 0; --i)
-        books[i] = pop();
+        books.at(i) = pop();
 
+    //for debugging purposes
     for (int i = 0; i < size; ++i)
     {
         cout << "Book #" << i + 1 << ": " << books[i] << ", ";
@@ -184,7 +185,7 @@ int* MinHeap::returnBooks()
 
 //update heap with bookNum of recommended books
 //returns array with recommended books, in decreasing order of similarity score
-int* MinHeap::recommendBooks(int bookNum)
+vector<int> MinHeap::recommendBooks(int bookNum)
 {
     unordered_map<int, int>::iterator it = ratingScore.begin();
     for (; it != ratingScore.end(); ++it)

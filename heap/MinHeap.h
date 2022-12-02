@@ -14,7 +14,7 @@ private:
     int pop();
     int min();
     void print();
-    int* returnBooks();
+    vector<int> returnBooks();
 
 public:
     MinHeap() {}
@@ -22,6 +22,6 @@ public:
     MinHeap(vector<int> userInput,
             unordered_map<int, vector<int>> reviews);
 
-    int* recommendBooks(int bookNum);
+    vector<int> recommendBooks(int bookNum);
 };
 
