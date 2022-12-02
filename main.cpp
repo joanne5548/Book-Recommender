@@ -7,36 +7,43 @@
 #include "Book.h"
 #include "MinHeap.h"
 
-void readBooks(std::unordered_map<int, Book>& books, const std::string& file);
+void readBooks(std::unordered_map<long, Book>& books, const std::string& file);
 
 void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                  const std::string& file);
 
 int main() {
 
-    // Key: Book id; Value: Book object that stores info
-    std::unordered_map<int, Book> books;
-    //vv this somehow produces error
+    // Key: isbn Value: Book object that stores info
+    std::unordered_map<long, Book> books;
     readBooks(books, "../data/books.csv");
 
     // Key: User id; Value: Vector of Liked Books (Books rated 4 and up)
     std::unordered_map<int, std::vector<int>> reviews;
     readReviews(reviews, "../data/ratings.csv");
 
+    int numOfBooks = 0;
+    std::cout << "Number of books to enter:" << std::endl;
+    std::cin >> numOfBooks;
+
+    std::string title;
+
+    std::cout << "Please enter your favorite books:" << std::endl;
+
     //contains bookID of user's favorite books
     //edit this to see different result
     //currently has Hunger Game (ID: 1) and Harry Potter (ID: 2)
-    std::vector<int> userInput = {1, 2};
-    MinHeap heap(userInput, reviews);
+    //std::vector<int> userInput = {439023483, 2};
+    //MinHeap heap(userInput, reviews);
 
     //Just need to edit this function to display book title instead of ID's
     //currently recommends 3 books
-    heap.recommendBooks(3);
+    //heap.recommendBooks(3);
 
     return 0;
 }
 
-void readBooks(std::unordered_map<int, Book>& books, const std::string& file) {
+void readBooks(std::unordered_map<long, Book>& books, const std::string& file) {
 
     std::ifstream in(file, std::ifstream::in);
 
@@ -112,15 +119,15 @@ void readBooks(std::unordered_map<int, Book>& books, const std::string& file) {
             // Discard last value
             getline(iss, discard);
 
-            // Check isbn and year
+            // Check isbn and year; skip if there is no isbn
             if (isbn == "")
-                isbn = "0";
+                continue;
 
             if (year == "")
                 year = "0";
 
-            Book toAdd(std::stol(isbn), std::stoi(year), author, title, cover);
-            books[std::stoi(bookID)] = toAdd;
+            Book toAdd(std::stoi(bookID), std::stoi(year), author, title, cover);
+            books[std::stol(isbn)] = toAdd;
         }
 
         in.close();
