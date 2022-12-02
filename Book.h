@@ -5,29 +5,29 @@
 
 struct Book {
 
-    unsigned long long isbn;
+    int bookID;
     int year; // Negative years exist in the data set
     std::string author;
     std::string title;
     std::string cover;
 
     Book();
-    Book(unsigned long long isbn, int year, std::string author, std::string title,
+    Book(int bookID, int year, std::string author, std::string title,
          std::string cover);
 
 };
 
 Book::Book() {
-    isbn = 0;
+    bookID = 0;
     year = 0;
     std::string author = "";
     std::string title = "";
     std::string cover = "";
 }
 
-Book::Book(unsigned long long isbn, int year, std::string author, std::string title,
+Book::Book(int bookID, int year, std::string author, std::string title,
            std::string cover) {
-    this->isbn = isbn;
+    this->bookID = bookID;
     this->year = year;
     this->author = author;
     this->title = title;
