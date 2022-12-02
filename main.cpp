@@ -5,30 +5,64 @@
 #include <unordered_map>
 #include <vector>
 #include "Book.h"
+#include "AdjacencyMatrix.h"
 #include "MinHeap.h"
 
-void readBooks(std::unordered_map<long, Book>& books, const std::string& file);
+void readBooks(std::unordered_map<long, Book>& books,
+               std::unordered_map<int, long>& bookMapper, const std::string& file);
 
 void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                  const std::string& file);
 
 int main() {
 
-    // Key: isbn Value: Book object that stores info
+    // Key: bookID; Value: isbn
+    std::unordered_map<int, long> bookMapper;
+
+    // Key: isbn; Value: Book object that stores info
     std::unordered_map<long, Book> books;
-    readBooks(books, "../data/books.csv");
+    readBooks(books, bookMapper, "../data/books.csv");
 
     // Key: User id; Value: Vector of Liked Books (Books rated 4 and up)
     std::unordered_map<int, std::vector<int>> reviews;
     readReviews(reviews, "../data/ratings.csv");
 
+    // Set up Adjacency Matrix
+    AdjacencyMatrix* matrix = new AdjacencyMatrix();
+    for (auto& review : reviews) {
+        for (int i = 0; i < review.second.size(); i++) {
+            for (int j = i + 1; j < review.second.size(); j++) {
+                matrix->InsertEdge(bookMapper[review.second.at(i)],
+                                   bookMapper[review.second.at(j)]);
+            }
+        }
+    }
+    //matrix->PrintMatrix();
+
+    /*
     int numOfBooks = 0;
     std::cout << "Number of books to enter:" << std::endl;
     std::cin >> numOfBooks;
 
-    std::string title;
+    long isbn;
+    std::vector<int> userInput;
+    std::cout << "Please enter the isbn of your favorite books:" << std::endl;
+    for (int i = 0; i <numOfBooks; i++) {
 
-    std::cout << "Please enter your favorite books:" << std::endl;
+        std::cin >> isbn;
+        // If isbn exists and is valid
+        if (books.count(isbn) == 1) {
+            userInput.push_back(isbn);
+            std::cout << "ISBN FOUND!" << std::endl;
+        }
+        else {
+            std::cout << "ISBN NOT FOUND!" << std::endl;
+        }
+    }
+
+
+    */
+
 
     //contains bookID of user's favorite books
     //edit this to see different result
@@ -43,7 +77,8 @@ int main() {
     return 0;
 }
 
-void readBooks(std::unordered_map<long, Book>& books, const std::string& file) {
+void readBooks(std::unordered_map<long, Book>& books,
+               std::unordered_map<int, long>& bookMapper, const std::string& file) {
 
     std::ifstream in(file, std::ifstream::in);
 
@@ -128,6 +163,7 @@ void readBooks(std::unordered_map<long, Book>& books, const std::string& file) {
 
             Book toAdd(std::stoi(bookID), std::stoi(year), author, title, cover);
             books[std::stol(isbn)] = toAdd;
+            bookMapper[std::stoi(bookID)] = std::stol(isbn);
         }
 
         in.close();
