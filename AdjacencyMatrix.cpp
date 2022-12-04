@@ -42,8 +42,8 @@ void AdjacencyMatrix::GetAdjacentNodes(long isbn, unordered_map<int, int>& allNo
 }
 
 void AdjacencyMatrix::PrintMatrix() {
-    for(int i = 0; i < 10000; i++) {
-        for(int j = 0; j < 10000; j++) {
+    for(int i = 0; i < 10; i++) {
+        for(int j = 0; j < 10; j++) {
             cout << matrix[i][j] << " ";
         }
         cout << endl;
