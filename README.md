@@ -14,7 +14,7 @@ for(int j = 0; j < 2; ++j) {
     // Reads in ISBNs.
     string input;
     int inputNum;
-    vector<int> isbns;
+    vector<long> isbns;
 
     while(input.compare("done") != 0) {
         bool isADigit = true;
@@ -26,7 +26,7 @@ for(int j = 0; j < 2; ++j) {
         }
 
         if(isADigit) {
-            inputNum = stoi(input);
+            inputNum = stol(input);
             isbns.push_back(inputNum);
         }
     }
