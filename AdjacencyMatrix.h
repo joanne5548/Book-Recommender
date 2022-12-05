@@ -12,6 +12,6 @@ public:
     AdjacencyMatrix();
     void InsertEdge(long firstISBN, long secondISBN);
     int GetWeight(long firstISBN, long secondISBN);
-    void GetAdjacentNodes(long isbn, unordered_map<int, int>& allNodes);
+    void GetAdjacentNodes(long isbn, unordered_map<long, long>& allNodes);
     void PrintMatrix();
 };
