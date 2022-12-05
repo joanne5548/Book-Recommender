@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <chrono>
 #include "Book.h"
@@ -16,11 +17,7 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                  std::unordered_map<int, long long>& bookMapper, AdjacencyMatrix* matrix,
                  const std::string& file);
 
-void printOutput(vector<Book> output);
-
 int main() {
-
-    cout << stoll("076531178X") << endl; //LOL
     // Key: bookID; Value: isbn
     std::unordered_map<int, long long> bookMapper;
 
@@ -43,13 +40,16 @@ int main() {
 
     //Compute initializing time for Adjacency Matrix
     auto matrixInitializeDuration = chrono::duration_cast<chrono::milliseconds>
-                            (matrixInitializeEndTime - matrixInitializeStartTime);
+            (matrixInitializeEndTime - matrixInitializeStartTime);
+
+
+    /***** Title Menu *****/
 
     cout << "Welcome to Book Recommender!" << endl;
     cout << "First, enter ISBN of your favorite books." << endl;
     cout << "If you are done, enter \"done\"." << endl;
 
-// Reads in ISBNs.
+    // Reads in ISBNs.
     string input;
     long long inputNum;
     vector<long long> isbns;
@@ -77,11 +77,11 @@ int main() {
         }
         else //If input is not valid ISBN
             cout << "Invalid ISBN. Please enter digits only." << endl;
-        
+
         cin >> input;
     }
 
-// When done is entered, asks user for how many books they would like to see.
+    // When done is entered, asks user for how many books they would like to see.
     cout << endl << "Thank you!" << endl;
     cout << "Now, tell us how many books you would like us to recommend." << endl;
 
@@ -90,9 +90,10 @@ int main() {
 
     cout << endl << "Thanks! Picking books for you ..." << endl;
 
-//Calculate the whole thing with matrix and heap
+    //Calculate the whole thing with matrix and heap
 
-//Heap Implementation:
+
+    /***** Heap Implementation *****/
 
     //Start measuring time for heap operation
     auto heapStartTime = chrono::high_resolution_clock::now();
@@ -101,7 +102,7 @@ int main() {
     vector<int> userInput;
     for (int i = 0; i < isbns.size(); ++i)
         userInput.push_back(books.find(isbns[i])->second.bookID);
-    
+
     MinHeap heap(userInput, reviews);
 
     //Recommend books
@@ -114,12 +115,27 @@ int main() {
         int isbn = bookMapper.find(heapOutputBookID[i])->second;
         heapOutput.push_back(books[isbn]);
     }
-    
+
     auto heapEndTime = chrono::high_resolution_clock::now();
     auto heapDuration = chrono::duration_cast<chrono::milliseconds>
-                                        (heapEndTime - heapStartTime);
-    
-//Adjacency Matrix Implementation:
+            (heapEndTime - heapStartTime);
+
+
+    /***** Adjacency Matrix Implementation *****/
+    std::unordered_map<long, long> adj;
+
+    for (int i = 0; i < isbns.size(); i++)
+        matrix->GetAdjacentNodes(isbns[i], adj);
+
+    std::multimap<long, long> matrixOutput;
+    for (auto& iter : adj) {
+        matrixOutput.emplace(iter.second, bookMapper[iter.first]);
+
+        // If vector stores too many books discard smallest one
+        if (matrixOutput.size() > numOfBooks) {
+            matrixOutput.erase(prev(matrixOutput.end()));
+        }
+    }
 
     //Start measuring time for adjacency matrix operation
     auto matrixOperationStartTime = chrono::high_resolution_clock::now();
@@ -129,17 +145,22 @@ int main() {
     //End measuring time
     auto matrixOperationEndTime = chrono::high_resolution_clock::now();
     auto matrixOperationDuration = chrono::duration_cast<chrono::milliseconds>
-                            (matrixOperationEndTime - matrixOperationStartTime);
+            (matrixOperationEndTime - matrixOperationStartTime);
 
 
-//display the result
+    //display the result
     cout << "Recommended books are:" << endl;
 
     //Heap:
-    printOutput(heapOutput);
+    cout << "Heap Recommendation: " << endl;
+    for (int i = 0; i < heapOutput.size(); ++i)
+        cout << "Book #" << i + 1 << ": " << heapOutput[i].title << " by " << heapOutput[i].author << endl;
 
     //Adjacency Matrix:
-
+    int index = 1;
+    cout << "Adjacency Matrix Recommendation: " << endl;
+    for (auto& iter : matrixOutput)
+        cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
 
 
     cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
@@ -300,13 +321,5 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
         }
 
         in.close();
-    }
-}
-
-void printOutput(vector<Book> output)
-{
-    for (int i = 0; i < output.size(); ++i)
-    {
-        cout << "Book #" << i + 1 << ": " << output[i].title << " by " << output[i].author << endl;
     }
 }
