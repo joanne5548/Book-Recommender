@@ -9,6 +9,7 @@ class MinHeap{
 private:
     vector<int> heap;
     unordered_map<int, int> ratingScore;
+    int debug = 0;
 
     void insert(int bookID);
     int pop();
@@ -19,8 +20,7 @@ private:
 public:
     MinHeap() {}
     MinHeap(unordered_map<int, int> _ratingScore);
-    MinHeap(vector<int> userInput,
-            unordered_map<int, vector<int>> reviews);
+    MinHeap(vector<int> userInput, unordered_map<int, vector<int>> reviews);
 
     vector<int> recommendBooks(int bookNum);
 };

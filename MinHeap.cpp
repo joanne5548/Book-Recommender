@@ -174,10 +174,13 @@ vector<int> MinHeap::returnBooks()
         books.at(i) = pop();
 
     //for debugging purposes
-    for (int i = 0; i < size; ++i)
+    if (debug)
     {
-        cout << "Book #" << i + 1 << ": " << books[i] << ", ";
-        cout << ratingScore[books[i]] << " people also liked this book" << endl;
+        for (int i = 0; i < size; ++i)
+        {
+            cout << "Book #" << i + 1 << ": " << books[i] << ", ";
+            cout << ratingScore[books[i]] << " people also liked this book" << endl;
+        }
     }
 
     return books;
