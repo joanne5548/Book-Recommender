@@ -10,8 +10,10 @@
 #include "AdjacencyMatrix.h"
 #include "MinHeap.h"
 
-void readBooks(std::unordered_map<long long, Book>& books,
-               std::unordered_map<int, long long>& bookMapper, const std::string& file);
+using namespace std;
+
+void readBooks(unordered_map<long long, Book>& books,
+               unordered_map<int, long long>& bookMapper, const string& file);
 
 void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                  std::unordered_map<int, long long>& bookMapper, AdjacencyMatrix* matrix,
@@ -19,10 +21,10 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
 
 int main() {
     // Key: bookID; Value: isbn
-    std::unordered_map<int, long long> bookMapper;
+    unordered_map<int, long long> bookMapper;
 
     // Key: isbn; Value: Book object that stores info
-    std::unordered_map<long long, Book> books;
+    unordered_map<long long, Book> books;
     readBooks(books, bookMapper, "./data/books.csv");
 
     // Set up Adjacency Matrix
@@ -134,19 +136,11 @@ int main() {
     std::unordered_map<long, long> adj; // Key: book ID; Value: weight
 
     for (int i = 0; i < isbns.size(); i++)
-        matrix->GetAdjacentNodes(books[isbns[i]].bookID, adj);
+        matrix->GetAdjacentNodes(books[isbns[i]].bookID - 1, adj);
 
-    std::multimap<long, long> matrixOutput;
-    for (auto& iter : adj) {
+    multimap<long, long, greater<long>> matrixOutput;
+    for (auto& iter : adj)
         matrixOutput.emplace(iter.second, bookMapper[iter.first]);
-        // FIXME
-        /*
-        // If vector stores too many books discard smallest one
-        if (matrixOutput.size() > numOfBooks) {
-            matrixOutput.erase(prev(matrixOutput.end()));
-        }
-         */
-    }
 
     //Start measuring time for adjacency matrix operation
     auto matrixOperationStartTime = chrono::high_resolution_clock::now();
@@ -171,7 +165,7 @@ int main() {
     int index = 1;
     cout << "Adjacency Matrix Recommendation: " << endl;
     for (auto& iter : matrixOutput) {
-        if (index == numOfBooks)
+        if (index > numOfBooks)
             break;
         cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
     }
