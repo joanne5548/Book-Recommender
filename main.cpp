@@ -133,14 +133,22 @@ int main() {
 
 
     /***** Adjacency Matrix Implementation *****/
-    std::unordered_map<long, long> adj; // Key: book ID; Value: weight
+    unordered_map<long, long> adj; // Key: book ID; Value: weight
 
     for (int i = 0; i < isbns.size(); i++)
-        matrix->GetAdjacentNodes(books[isbns[i]].bookID - 1, adj);
+        matrix->GetAdjacentNodes(books[isbns[i]].bookID, adj);
 
     multimap<long, long, greater<long>> matrixOutput;
-    for (auto& iter : adj)
+    for (auto& iter : adj) {
+        // Book has no isbn and does not exist
+        if (bookMapper.count(iter.first) != 1)
+            continue;
+
         matrixOutput.emplace(iter.second, bookMapper[iter.first]);
+
+        if (matrixOutput.size() > numOfBooks)
+            matrixOutput.erase(prev(matrixOutput.end()));
+    }
 
     //Start measuring time for adjacency matrix operation
     auto matrixOperationStartTime = chrono::high_resolution_clock::now();
@@ -165,11 +173,8 @@ int main() {
     int index = 1;
     cout << "Adjacency Matrix Recommendation: " << endl;
     for (auto& iter : matrixOutput) {
-        if (index > numOfBooks)
-            break;
         cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
     }
-
 
     cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
 
