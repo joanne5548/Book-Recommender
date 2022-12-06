@@ -12,14 +12,22 @@
 
 using namespace std;
 
+void menu(unordered_map<long long, Book>& books, int& numOfBooks, vector<long long>& isbns);
+
+void outPut(unordered_map<long long, Book>& books, vector<Book>& heapOutput,
+            multimap<int, long, greater<int>>& matrixOutput);
+
 void readBooks(unordered_map<long long, Book>& books,
                unordered_map<int, long long>& bookMapper, const string& file);
 
-void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
-                 std::unordered_map<int, long long>& bookMapper, AdjacencyMatrix* matrix,
-                 const std::string& file);
+void readReviews(unordered_map<int, vector<int>>& reviews,
+                 unordered_map<int, long long>& bookMapper, AdjacencyMatrix* matrix,
+                 const string& file);
 
 int main() {
+
+    /***** Initialization *****/
+
     // Key: bookID; Value: isbn
     unordered_map<int, long long> bookMapper;
 
@@ -37,7 +45,7 @@ int main() {
     auto matrixInitializeStartTime = chrono::high_resolution_clock::now();
 
     // Create matrix as each value becomes available
-    readReviews(reviews, bookMapper, matrix, "./data/ratings_trunicated.csv"); 
+    readReviews(reviews, bookMapper, matrix, "./data/ratings_trunicated.csv");
     //readReviews(reviews, bookMapper, matrix, "./data/ratings_test.csv"); //FOR TESTING
 
     //Insert edge weights into Adjacency Matrix
@@ -49,55 +57,14 @@ int main() {
     auto matrixInitializeDuration = chrono::duration_cast<chrono::milliseconds>
             (matrixInitializeEndTime - matrixInitializeStartTime);
 
-
-    /***** Title Menu *****/
-
-    cout << "Welcome to Book Recommender!" << endl;
-    cout << "First, enter ISBN of your favorite books." << endl;
-    cout << "If you are done, enter \"done\"." << endl;
+    /***** Menu *****/
 
     // Reads in ISBNs
     string input;
-    long long inputNum;
     vector<long long> isbns;
-
-    cin >> input;
-    while(input.compare("done") != 0) {
-        bool isADigit = true;
-
-        //Check if input has only digits
-        for(int k = 0; k < input.size(); k++) {
-            if(!isdigit(input.at(k))) {
-                isADigit = false;
-            }
-        }
-
-        //If input is valid ISBN
-        if(isADigit) {
-            inputNum = stoll(input);
-
-            //check if inputted isbn is in the book dataset
-            if (books.find(inputNum) == books.end())
-                cout << "The ISBN entered is not in the book dataset. Please try another book." << endl;
-            else
-                isbns.push_back(inputNum);
-        }
-        else //If input is not valid ISBN
-            cout << "Invalid ISBN. Please enter digits only." << endl;
-
-        cin >> input;
-    }
-
-    // When done is entered, asks user for how many books they would like to see.
-    cout << endl << "Thank you!" << endl;
-    cout << "Now, tell us how many books you would like us to recommend." << endl;
-
     int numOfBooks;
-    cin >> numOfBooks;
 
-    cout << endl << "Thanks! Picking books for you ..." << endl;
-
-    //Recommend Books
+    menu(books, numOfBooks, isbns);
 
     /***** Heap Implementation *****/
 
@@ -151,32 +118,13 @@ int main() {
             matrixOutput.erase(prev(matrixOutput.end()));
     }
 
+    /***** Book Output *****/
+    outPut(books, heapOutput, matrixOutput);
+
     //End measuring time
     auto matrixOperationEndTime = chrono::high_resolution_clock::now();
     auto matrixOperationDuration = chrono::duration_cast<chrono::milliseconds>
             (matrixOperationEndTime - matrixOperationStartTime);
-
-
-    //display the result
-    cout << "Recommended books are:" << endl;
-
-    //Heap:
-    cout << "Heap Recommendation: " << endl;
-    for (int i = 0; i < heapOutput.size(); ++i)
-        cout << "Book #" << i + 1 << ": " << heapOutput[i].title << " by " << heapOutput[i].author << endl;
-
-    //Adjacency Matrix:
-    int index = 1;
-    cout << "Adjacency Matrix Recommendation: " << endl;
-    for (auto& iter : matrixOutput) {
-        cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
-    }
-
-    cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
-
-    for (int i = 0; i < 70; ++i)
-        cout << "*";
-    cout << endl;
 
 //Compare the operation time measured for Heap and Adjacency Matrix
     cout << endl << "Time duration for Heap implementation was: ";
@@ -190,36 +138,107 @@ int main() {
     return 0;
 }
 
-void readBooks(std::unordered_map<long long, Book>& books,
-               std::unordered_map<int, long long>& bookMapper, const std::string& file) {
+void menu(unordered_map<long long, Book>& books, int& numOfBooks, vector<long long>& isbns) {
 
-    std::ifstream in(file, std::ifstream::in);
+    cout << "Welcome to Book Recommender!" << endl;
+    cout << "First, enter ISBN of your favorite books." << endl;
+    cout << "If you are done, enter \"done\"." << endl;
+
+    string input;
+    cin >> input;
+
+    while(input.compare("done") != 0) {
+        bool isADigit = true;
+
+        //Check if input has only digits
+        for(int k = 0; k < input.size(); k++) {
+            if(!isdigit(input.at(k))) {
+                isADigit = false;
+            }
+        }
+
+        //If input is valid ISBN
+        long long inputNum;
+        if(isADigit) {
+            inputNum = stoll(input);
+
+            //check if inputted isbn is in the book dataset
+            if (books.find(inputNum) == books.end())
+                cout << "The ISBN entered is not in the book dataset. Please try another book." << endl;
+            else
+                isbns.push_back(inputNum);
+        }
+        else //If input is not valid ISBN
+            cout << "Invalid ISBN. Please enter digits only." << endl;
+
+        cin >> input;
+    }
+
+    // When done is entered, asks user for how many books they would like to see.
+    cout << endl << "Thank you!" << endl;
+    cout << "Now, tell us how many books you would like us to recommend." << endl;
+
+    cin >> numOfBooks;
+
+    cout << endl << "Thanks! Picking books for you ..." << endl;
+}
+
+void outPut(unordered_map<long long, Book>& books, vector<Book>& heapOutput,
+            multimap<int, long, greater<int>>& matrixOutput) {
+
+    //display the result
+    cout << "Recommended books are:" << endl;
+
+    //Heap:
+    cout << "Heap Recommendation: " << endl;
+    for (int i = 0; i < heapOutput.size(); ++i)
+        cout << "Book #" << i + 1 << ": " << heapOutput[i].title << " by " << heapOutput[i].author << endl;
+    cout << endl;
+
+    //Adjacency Matrix:
+    int index = 1;
+    cout << "Adjacency Matrix Recommendation: " << endl;
+    for (auto& iter : matrixOutput)
+        cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
+
+    cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
+
+    for (int i = 0; i < 70; ++i)
+        cout << "*";
+
+    cout << endl;
+}
+
+void readBooks(unordered_map<long long, Book>& books,
+               unordered_map<int, long long>& bookMapper, const string& file) {
+
+    ifstream in(file, ifstream::in);
 
     if (in.is_open()) {
 
-        std::string line;
+        string line;
         getline(in, line);  // Removes headers from file
 
         while (getline(in, line)) {
 
-            std::istringstream iss(line);
-            std::string discard;
+            istringstream iss(line);
+            string discard;
 
-            std::string bookID;
+            string bookID;
             getline(iss, bookID, ',');
 
             // Discard next 4 values
             for (int i = 0; i < 4; i++)
                 getline(iss, discard, ',');
 
-            std::string isbn;
+            string isbn;
             getline(iss, isbn, ',');
 
             // Discard next value
             getline(iss, discard, ',');
 
             // Checking for commas with quotes (",")
-            std::string author;
+            string author;
             if (iss.peek() == '\"') {
                 iss.get();  // Discards quote to access author
                 getline(iss, author, '\"');
@@ -228,7 +247,7 @@ void readBooks(std::unordered_map<long long, Book>& books,
             else
                 getline(iss, author, ',');
 
-            std::string year;
+            string year;
             getline(iss, year, ',');
 
             // Discard next value; check for comma with quotes (",")
@@ -248,7 +267,7 @@ void readBooks(std::unordered_map<long long, Book>& books,
                 getline(iss, discard, ',');
 
             // Checking for commas with quotes (",")
-            std::string title;
+            string title;
             if (iss.peek() == '\"') {
                 iss.get();  // Discards quote to access title
                 getline(iss, title, '\"');
@@ -261,7 +280,7 @@ void readBooks(std::unordered_map<long long, Book>& books,
             for (int i = 0; i < 10; i++)
                 getline(iss, discard, ',');
 
-            std::string cover;
+            string cover;
             getline(iss, cover, ',');
 
             // Discard last value
@@ -274,39 +293,39 @@ void readBooks(std::unordered_map<long long, Book>& books,
             if (year == "")
                 year = "0";
 
-            Book toAdd(std::stoi(bookID), std::stoi(year), author, title, cover);
-            books[std::stoll(isbn)] = toAdd;
-            bookMapper[std::stoi(bookID)] = std::stoll(isbn);
+            Book toAdd(stoi(bookID), stoi(year), author, title, cover);
+            books[stoll(isbn)] = toAdd;
+            bookMapper[stoi(bookID)] = stoll(isbn);
         }
 
         in.close();
     }
 }
 
-void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
-                 std::unordered_map<int, long long>& bookMapper,
-                 AdjacencyMatrix* matrix, const std::string& file) {
+void readReviews(unordered_map<int, vector<int>>& reviews,
+                 unordered_map<int, long long>& bookMapper,
+                 AdjacencyMatrix* matrix, const string& file) {
 
-    std::ifstream in(file, std::ifstream::in);
+    ifstream in(file, ifstream::in);
 
     if (in.is_open()) {
 
-        std::string line;
+        string line;
         getline(in, line);  // Remove headers from file
 
         while (getline(in, line)) {
 
-            std::istringstream iss(line);
+            istringstream iss(line);
 
-            std::string tempUser;
+            string tempUser;
             getline(iss, tempUser, ',');
             int userID = std::stoi(tempUser);
 
-            std::string tempBook;
+            string tempBook;
             getline(iss, tempBook, ',');
             int bookID = std::stoi(tempBook);
 
-            std::string rating;
+            string rating;
             getline(iss, rating);
 
             // Don't process reviews on books with no isbn
@@ -314,7 +333,7 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                 continue;
 
             // Filtering out ratings lower than 4
-            if (std::stoi(rating) == 5)
+            if (stoi(rating) == 5)
                 reviews[userID].push_back(bookID);
             else
                 continue;
