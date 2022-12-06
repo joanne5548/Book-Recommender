@@ -30,29 +30,25 @@ int main() {
     // Set up Adjacency Matrix
     AdjacencyMatrix* matrix = new AdjacencyMatrix();
 
-    // Key: User id; Value: Vector of Liked Books (Books rated 4 and up)
+    // Key: User ID; Value: Vector of Liked Books (Books rated 4 and up)
     std::unordered_map<int, std::vector<int>> reviews;
 
     //Start measuring operation time for Adjacency Matrix
     auto matrixInitializeStartTime = chrono::high_resolution_clock::now();
 
     // Create matrix as each value becomes available
-    readReviews(reviews, bookMapper, matrix, "./data/ratings_trunicated.csv");
+    readReviews(reviews, bookMapper, matrix, "./data/ratings_trunicated.csv"); 
+    //readReviews(reviews, bookMapper, matrix, "./data/ratings_test.csv"); //FOR TESTING
+
+    //Insert edge weights into Adjacency Matrix
+    matrix->InsertEdgeList(reviews);
+
     auto matrixInitializeEndTime = chrono::high_resolution_clock::now();
 
     //Compute initializing time for Adjacency Matrix
     auto matrixInitializeDuration = chrono::duration_cast<chrono::milliseconds>
             (matrixInitializeEndTime - matrixInitializeStartTime);
 
-    for (auto& iter : reviews) {
-        for (int i = 0; i < iter.second.size(); i++) {
-            for (int j = i + 1; j < iter.second.size(); j++) {
-                matrix->InsertEdge(i,j);
-            }
-        }
-    }
-
-    //matrix->PrintMatrix();
 
     /***** Title Menu *****/
 
@@ -60,7 +56,7 @@ int main() {
     cout << "First, enter ISBN of your favorite books." << endl;
     cout << "If you are done, enter \"done\"." << endl;
 
-    // Reads in ISBNs.
+    // Reads in ISBNs
     string input;
     long long inputNum;
     vector<long long> isbns;
@@ -101,8 +97,7 @@ int main() {
 
     cout << endl << "Thanks! Picking books for you ..." << endl;
 
-    //Calculate the whole thing with matrix and heap
-
+    //Recommend Books
 
     /***** Heap Implementation *****/
 
@@ -133,12 +128,18 @@ int main() {
 
 
     /***** Adjacency Matrix Implementation *****/
-    unordered_map<long, long> adj; // Key: book ID; Value: weight
+
+    //Start measuring time for adjacency matrix operation
+    auto matrixOperationStartTime = chrono::high_resolution_clock::now();
+
+    //Calculate recommendation
+    unordered_map<int, int> adj; // Key: book ID; Value: weight
 
     for (int i = 0; i < isbns.size(); i++)
-        matrix->GetAdjacentNodes(books[isbns[i]].bookID, adj);
+        matrix->GetAdjacentNodes(books[isbns[i]].bookID, userInput, adj);//
 
-    multimap<long, long, greater<long>> matrixOutput;
+    //Maps from similarity score to ISBN
+    multimap<int, long, greater<int>> matrixOutput;
     for (auto& iter : adj) {
         // Book has no isbn and does not exist
         if (bookMapper.count(iter.first) != 1)
@@ -149,11 +150,6 @@ int main() {
         if (matrixOutput.size() > numOfBooks)
             matrixOutput.erase(prev(matrixOutput.end()));
     }
-
-    //Start measuring time for adjacency matrix operation
-    auto matrixOperationStartTime = chrono::high_resolution_clock::now();
-
-    //Calculate recommendation
 
     //End measuring time
     auto matrixOperationEndTime = chrono::high_resolution_clock::now();
@@ -184,10 +180,11 @@ int main() {
 
 //Compare the operation time measured for Heap and Adjacency Matrix
     cout << endl << "Time duration for Heap implementation was: ";
-    cout << heapDuration.count()/1000.0 << " seconds." << endl;
+    cout << heapDuration.count()/1000.0 << " seconds" << endl;
 
     cout << "Time duration for Adjacency Matrix implementation was: ";
-    cout << (matrixInitializeDuration + matrixOperationDuration).count()/1000.0 << " seconds." << endl;
+    cout << (matrixInitializeDuration + matrixOperationDuration).count()/1000.0 << " seconds" << endl;
+    cout << endl;
 
     delete matrix;
     return 0;

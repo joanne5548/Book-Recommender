@@ -10,36 +10,49 @@ AdjacencyMatrix::AdjacencyMatrix() {
     }
 }
 
-void AdjacencyMatrix::InsertEdge(long firstISBN, long secondISBN) {
-    if(firstISBN == secondISBN)
+void AdjacencyMatrix::InsertEdge(int firstBookID, int secondBookID) {
+    if(firstBookID == secondBookID)
         return;
 
-    if(indexMatcher.count(firstISBN) == 0) {
-        indexMatcher.emplace(firstISBN, indexCounter);
-        reverseIndexMatcher.emplace(indexCounter, firstISBN);
+    if(indexMatcher.count(firstBookID) == 0) {
+        indexMatcher.emplace(firstBookID, indexCounter);
+        reverseIndexMatcher.emplace(indexCounter, firstBookID);
         indexCounter++;
     }
-    if(indexMatcher.count(secondISBN) == 0) {
-        indexMatcher.emplace(secondISBN, indexCounter);
-        reverseIndexMatcher.emplace(indexCounter, secondISBN);
+    if(indexMatcher.count(secondBookID) == 0) {
+        indexMatcher.emplace(secondBookID, indexCounter);
+        reverseIndexMatcher.emplace(indexCounter, secondBookID);
         indexCounter++;
     }
 
-    matrix[indexMatcher[firstISBN]][indexMatcher[secondISBN]]++;
-    matrix[indexMatcher[secondISBN]][indexMatcher[firstISBN]]++;
+    matrix[indexMatcher[firstBookID]][indexMatcher[secondBookID]]++;
+    matrix[indexMatcher[secondBookID]][indexMatcher[firstBookID]]++;
 }
 
-int AdjacencyMatrix::GetWeight(long firstISBN, long secondISBN) {
-    return matrix[indexMatcher[firstISBN]][indexMatcher[secondISBN]];
+void AdjacencyMatrix::InsertEdgeList(unordered_map<int, vector<int>>& reviews)
+{
+    for (auto iter = reviews.begin(); iter != reviews.end(); ++iter){
+        for (int i = 0; i < iter->second.size(); i++) {
+            for (int j = i + 1; j < iter->second.size(); j++) {
+                InsertEdge(iter->second[i], iter->second[j]);
+            }
+        }
+    }
+}
+
+int AdjacencyMatrix::GetWeight(int firstBookID, int secondBookID) {
+    return matrix[indexMatcher[firstBookID]][indexMatcher[secondBookID]];
 }
     
-void AdjacencyMatrix::GetAdjacentNodes(long isbn, unordered_map<long, long>& allNodes) {
+void AdjacencyMatrix::GetAdjacentNodes(int bookID, vector<int> userInput, unordered_map<int, int>& allNodes) {
     for(int i = 0; i < 10000; i++) {
-        if(matrix[indexMatcher[isbn]][i] != 0) {
+        //Check if current book is one of user input, don't update similarity score if it is
+        if(find(userInput.begin(), userInput.end(), reverseIndexMatcher[i]) == userInput.end() 
+                                                 && matrix[indexMatcher[bookID]][i] != 0) {
             if (allNodes.count(reverseIndexMatcher[i]) == 0)
-                allNodes.emplace(reverseIndexMatcher[i], matrix[indexMatcher[isbn]][i]);
+                allNodes.emplace(reverseIndexMatcher[i], matrix[indexMatcher[bookID]][i]);
             else
-                allNodes[reverseIndexMatcher[i]] += matrix[indexMatcher[isbn]][i];
+                allNodes[reverseIndexMatcher[i]] += matrix[indexMatcher[bookID]][i];
         }
     }
 }
