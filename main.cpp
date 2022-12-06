@@ -42,6 +42,15 @@ int main() {
     auto matrixInitializeDuration = chrono::duration_cast<chrono::milliseconds>
             (matrixInitializeEndTime - matrixInitializeStartTime);
 
+    for (auto& iter : reviews) {
+        for (int i = 0; i < iter.second.size(); i++) {
+            for (int j = i + 1; j < iter.second.size(); j++) {
+                matrix->InsertEdge(i,j);
+            }
+        }
+    }
+
+    //matrix->PrintMatrix();
 
     /***** Title Menu *****/
 
@@ -122,19 +131,21 @@ int main() {
 
 
     /***** Adjacency Matrix Implementation *****/
-    std::unordered_map<long, long> adj;
+    std::unordered_map<long, long> adj; // Key: book ID; Value: weight
 
     for (int i = 0; i < isbns.size(); i++)
-        matrix->GetAdjacentNodes(isbns[i], adj);
+        matrix->GetAdjacentNodes(books[isbns[i]].bookID, adj);
 
     std::multimap<long, long> matrixOutput;
     for (auto& iter : adj) {
         matrixOutput.emplace(iter.second, bookMapper[iter.first]);
-
+        // FIXME
+        /*
         // If vector stores too many books discard smallest one
         if (matrixOutput.size() > numOfBooks) {
             matrixOutput.erase(prev(matrixOutput.end()));
         }
+         */
     }
 
     //Start measuring time for adjacency matrix operation
@@ -159,8 +170,11 @@ int main() {
     //Adjacency Matrix:
     int index = 1;
     cout << "Adjacency Matrix Recommendation: " << endl;
-    for (auto& iter : matrixOutput)
+    for (auto& iter : matrixOutput) {
+        if (index == numOfBooks)
+            break;
         cout << "Book #" << index++ << ": " << books[iter.second].title << " by " << books[iter.second].author << endl;
+    }
 
 
     cout << endl << "Thank you for using Fish Against Education Book Recommender!" << endl;
@@ -308,16 +322,6 @@ void readReviews(std::unordered_map<int, std::vector<int>>& reviews,
                 reviews[userID].push_back(bookID);
             else
                 continue;
-
-            // Insert into adj. matrix
-            // Don't insert if there is only one book in the vector
-            int vectSize = reviews[userID].size();
-            if (vectSize == 1)
-                continue;
-
-            for (int i = 0; i < vectSize - 1; i++) {
-                matrix->InsertEdge(reviews[userID].at(vectSize - 1), reviews[userID].at(i));
-            }
         }
 
         in.close();
