@@ -31,12 +31,14 @@ void AdjacencyMatrix::InsertEdge(long firstISBN, long secondISBN) {
 
 int AdjacencyMatrix::GetWeight(long firstISBN, long secondISBN) {
     return matrix[indexMatcher[firstISBN]][indexMatcher[secondISBN]];
-}
-
+    
 void AdjacencyMatrix::GetAdjacentNodes(long isbn, unordered_map<long, long>& allNodes) {
     for(int i = 0; i < 10000; i++) {
         if(matrix[indexMatcher[isbn]][i] != 0) {
-            allNodes.emplace(reverseIndexMatcher[i], matrix[indexMatcher[isbn]][i]);
+            if (allNodes.count(reverseIndexMatcher[i]) == 0)
+                allNodes.emplace(reverseIndexMatcher[i], matrix[indexMatcher[isbn]][i]);
+            else
+                allNodes[reverseIndexMatcher[i]] += matrix[indexMatcher[isbn]][i];
         }
     }
 }
